@@ -16,7 +16,7 @@ public class Flashlight : MonoBehaviour
     float time = 0f;
     float randNum = 0f;
 
-    public static bool playerSeen = false;
+    public bool playerSeen = false;
     
 
     // Start is called before the first frame update
