@@ -24,6 +24,7 @@ public class Enemy : MonoBehaviour
         step = walkSpeed * Time.deltaTime;
         waitTime = startWaitTime;
         randomSpot = Random.Range(0, moveSpots.Length);
+        target = GetComponentInChildren<Flashlight>().target;
     }
 
     // Update is called once per frame
@@ -31,7 +32,7 @@ public class Enemy : MonoBehaviour
     {
 
         //Run at player
-        if (GameObject.FindGameObjectWithTag("Flashlight").GetComponent<Flashlight>().playerSeen)
+        if (GetComponentInChildren<Flashlight>().playerSeen)
         {
             transform.position = Vector2.MoveTowards(transform.position, target.position, movSpd * Time.deltaTime);
 
@@ -53,24 +54,30 @@ public class Enemy : MonoBehaviour
         else
         {
             transform.position = Vector2.MoveTowards(transform.position, moveSpots[randomSpot].position, step);
-
+            //Debug.Log(Vector2.Distance(transform.position, moveSpots[randomSpot].position));
             if (Vector2.Distance(transform.position, moveSpots[randomSpot].position) < 0.2f)
             {
-                int newSpot = Random.Range(0, moveSpots.Length);
-
-                while (newSpot == randomSpot)
+                if (waitTime <= 0)
                 {
-                    newSpot = Random.Range(0, moveSpots.Length);
+                    int newSpot = Random.Range(0, moveSpots.Length);
+
+                    while (newSpot == randomSpot)
+                    {
+                        newSpot = Random.Range(0, moveSpots.Length);
+                    }
+                    randomSpot = newSpot;
+
+                    waitTime = startWaitTime;
                 }
-                randomSpot = newSpot;
-
-                waitTime = startWaitTime;
+                else
+                {
+                    animator.SetBool("isMovingRight", isMovRight);
+                    animator.SetFloat("speed", 0f);
+                    waitTime -= Time.deltaTime;
+                }
 
             }
-            else
-            {
-                waitTime -= Time.deltaTime;
-            }
+            
         }
     }
 

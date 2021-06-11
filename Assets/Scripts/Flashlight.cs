@@ -10,13 +10,12 @@ public class Flashlight : MonoBehaviour
     public Transform enemy;
     public float outerAngle;
     public float outerRadius;
-    Light2D light;
+    new Light2D light;
     Vector3 currentEulerAngles;
-    public float rotationSpeed = 3f;
-    float time = 0f;
-    float randNum = 0f;
-
+    float time;
+    float spinTime = 5f;
     public bool playerSeen = false;
+    bool spinClockwise = false;
     
 
     // Start is called before the first frame update
@@ -27,23 +26,59 @@ public class Flashlight : MonoBehaviour
         light = GetComponent<Light2D>();
         outerAngle = light.pointLightOuterAngle;
         outerRadius = light.pointLightOuterRadius;
+        time = spinTime;
+        
+     
     }
 
     // Update is called once per frame
     void Update()
     {
-        time += Time.deltaTime;
 
-        randNum = Random.Range(-90f, 90f);
-        
-        
-        
-        while(time < 5) {
-            transform.Rotate(0, 0, 10 * Time.deltaTime);
+        Vector3 newRotationAngles = transform.rotation.eulerAngles;
+
+        time -= Time.deltaTime;
+
+        if (time >= 0) {
+            if (spinClockwise)
+            {
+                newRotationAngles.z +=  -10 * Time.deltaTime;
+            }
+            else
+            {
+                newRotationAngles.z += 10 * Time.deltaTime;
+                
+
+            }
+            transform.rotation = Quaternion.Euler(newRotationAngles);
+
+
+            /*
+            Debug.Log(Vector3.Angle(flashLightDest, transform.rotation.eulerAngles) < 10);
+
+            
+            if (Vector3.Angle(flashLightDest, transform.rotation.eulerAngles) < 10)
+            {
+                randNum = Random.Range(0f, 90f);
+                flashLightDest = new Vector3(0, 0, randNum);
+            }
+            */
+            
 
         }
-        time = 0;
+        else
+        {
+            time = spinTime;
+            spinClockwise = !spinClockwise;
+        }
+         
 
+
+
+    
+        
+       
+        
 
 
 
@@ -65,7 +100,7 @@ public class Flashlight : MonoBehaviour
     bool checkPlayerSeen()
     {
 
-        float rotation= transform.eulerAngles.z;
+        float rotation = transform.eulerAngles.z;
    
         Vector3 dir = target.position - enemy.position;
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
@@ -77,8 +112,7 @@ public class Flashlight : MonoBehaviour
         
         float leftBound = (outerAngle / 2) + rotation + 90;
         float rightBound = rotation - (outerAngle / 2) + 90;
-        //Debug.Log(rotation);
-        //Debug.Log(angle + "vs: " + leftBound + " to" + rightBound);
+
         if (angle < leftBound && angle > rightBound) {
 
             return true;
